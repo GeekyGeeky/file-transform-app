@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Http\UploadedFile;
 
-use OzdemirBurak\JsonCsv\File\Csv;
 
 class FileTransformController extends Controller
 {
@@ -46,23 +44,22 @@ class FileTransformController extends Controller
 
         // Retrieve a portion of the validated input data...
         $validated = $validator->safe()->only(['data_file', 'sort_by']);
-
+        $sortBy = $validated['sort_by'] ?? '';
         $uploadedFile = $validated['data_file'];
 
         $path = $uploadedFile->path();
         $extension = $uploadedFile->getClientOriginalExtension();
-        // dd($extension);\\
-        // return Response::json([
-        //     'error' => $extension
-        // ]);
 
         $transformMethod = FileTransformFactory::getConversionMethod($extension);
         $typeAndExtension =  $transformMethod->getTypeAndExtension();
-
-        header('Content-disposition: attachment; filename=' . 'result.' .  $typeAndExtension['extension']);
-        header('Content-type: ' .  $typeAndExtension['type']);
-        echo $transformMethod->convert($path);
+        $this->setHeaders($typeAndExtension['extension'], $typeAndExtension['type']);
+        echo $transformMethod->convert($path, $sortBy);
         exit();
+    }
 
+    private function setHeaders($fileext, $filetype)
+    {
+        header('Content-disposition: attachment; filename=' . 'result.' .  $fileext);
+        header('Content-type: ' . $filetype);
     }
 }

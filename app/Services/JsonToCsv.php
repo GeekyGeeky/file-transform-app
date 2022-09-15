@@ -15,7 +15,7 @@ class JsonToCsv implements FileTransform
         return ['type' => 'text/csv', 'extension' => 'csv'];
     }
 
-    public function convert(string $filepath): string
+    public function convert(string $filepath,string $sortBy = ''): string
     {
 
         $flattened = array_map(function ($d) {

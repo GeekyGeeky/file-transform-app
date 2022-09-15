@@ -19,7 +19,7 @@ class CsvToJson implements FileTransform
     }
 
 
-    public function convert(string $filepath): string
+    public function convert(string $filepath, string $sortBy = ''): string
     {
 
         $data = $this->parseData($filepath);
