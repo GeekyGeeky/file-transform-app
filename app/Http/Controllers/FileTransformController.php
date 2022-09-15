@@ -28,6 +28,10 @@ class FileTransformController extends Controller
                 'data_file' => [
                     'required',
                     Rule::prohibitedIf(fn () => !$request->hasFile('data_file') || !$request->file('data_file')->isValid())
+                ],
+                'sort_by' => [
+                    'nullable',
+                    // Rule::prohibitedIf(fn () => !$request->hasFile('data_file') || !$request->file('data_file')->isValid())
                 ]
             ],
             [
