@@ -10,6 +10,9 @@ use App\Interfaces\FileTransform;
 class CsvToJson implements FileTransform
 {
 
+    /**
+     * @return array<string,string>
+     */
     public function getTypeAndExtension(): array
     {
         return ['type' => 'application/json', 'extension' => 'json'];
@@ -25,9 +28,11 @@ class CsvToJson implements FileTransform
             return explode('_', $key);
         }, $keys);
 
-        return json_encode(array_map(function ($line) use ($splitKeys) {
+        $mapData = array_map(function ($line) use ($splitKeys) {
             return $this->getJsonObject($line, $splitKeys);
-        }, $data), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }, $data);
+
+        return json_encode($mapData[0], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         // return '';
         // return file_put_contents($path, $this->convert());

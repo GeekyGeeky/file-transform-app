@@ -7,14 +7,14 @@ use App\Services\CsvToJson;
 use App\Services\JsonToCsv;
 
 /**
- * This class helps to produce a proper strategy object for handling a payment.
+ * This class helps to produce a proper strategy object for handling a file transformation
  */
 class FileTransformFactory
 {
     /**
-     * Get a payment method by its ID.
+     * Get a transformation method by its filetype.
      *
-     * @param $id
+     * @param string $filetype
      * @return FileTransform
      * @throws \Exception
      */
