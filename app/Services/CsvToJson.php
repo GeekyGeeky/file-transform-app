@@ -32,7 +32,7 @@ class CsvToJson implements FileTransform
             return $this->getJsonObject($line, $splitKeys);
         }, $data);
 
-        $collection = collect($mapData[0]);
+        $collection = collect($mapData);
 
         if (!empty($sortBy)) {
             $collection = $collection->sortBy($sortBy)->all();
