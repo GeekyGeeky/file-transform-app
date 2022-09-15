@@ -8,6 +8,7 @@ use App\Services\JsonToCsv;
 
 /**
  * This class helps to produce a proper strategy object for handling a file transformation
+ * It determines the strategy to be called by the filetype passed to the method
  */
 class FileTransformFactory
 {

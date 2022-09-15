@@ -23,8 +23,10 @@ class JsonToCsv implements FileTransform
                 return $this->flatten($d);
             else return [$d];
         }, json_decode(file_get_contents($filepath), true));
-        // create an array with all of the keys where each has a null value
+
+        // create an array with all null keys
         $default = $this->getArrayOfNulls($flattened);
+
         // merge default with the actual data so that non existent keys will have null values
         $mapData = array_map(function ($d) use ($default) {
             return array_merge($default, $d);
@@ -33,10 +35,9 @@ class JsonToCsv implements FileTransform
         $collection = collect($mapData);
 
         if (!empty($sortBy)) {
-            $collection = $collection->sortBy($sortBy)->all();
+            $collection = $collection->sortBy($sortBy);
         }
-
-        return $this->toCsvString($collection);
+        return $this->toCsvString($collection->all());
     }
 
     /**
@@ -67,7 +68,6 @@ class JsonToCsv implements FileTransform
      */
     protected function flatten(array $array = [], $prefix = '', array $result = []): array
     {
-        // if (\is_array($value)) {}
         foreach ($array as $key => $value) {
             if (\is_array($value)) {
                 $result = array_merge($result, $this->flatten($value, $prefix . $key . '_'));

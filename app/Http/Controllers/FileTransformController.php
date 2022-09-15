@@ -13,7 +13,8 @@ class FileTransformController extends Controller
 {
 
     /**
-     * A single source of operation
+     * A single source of operation for transforming files
+     * Recieves the request as a dependency, validates the input and triggers the file transform service
      *
      * @var    \Illuminate\Http\UploadedFile $uploadedFile
      * @param  \App\Http\Request $request
@@ -29,10 +30,7 @@ class FileTransformController extends Controller
                     'required',
                     Rule::prohibitedIf(fn () => !$request->hasFile('data_file') || !$request->file('data_file')->isValid())
                 ],
-                'sort_by' => [
-                    'nullable',
-                    // Rule::prohibitedIf(fn () => !$request->hasFile('data_file') || !$request->file('data_file')->isValid())
-                ]
+                'sort_by' => ['nullable']
             ],
             [
                 'data_file.prohibited' => 'File type must be JSON or CSV'
@@ -46,19 +44,31 @@ class FileTransformController extends Controller
             ]);
         }
 
-        // Retrieve a portion of the validated input data...
-        $validated = $validator->safe()->only(['data_file', 'sort_by']);
-        $sortBy = $validated['sort_by'] ?? '';
-        $uploadedFile = $validated['data_file'];
+        try {
+            // Retrieve a portion of the validated input data...
+            $validated = $validator->safe()->only(['data_file', 'sort_by']);
+            $sortBy = $validated['sort_by'] ?? '';
+            $uploadedFile = $validated['data_file'];
 
-        $path = $uploadedFile->path();
-        $extension = $uploadedFile->getClientOriginalExtension();
+            $path = $uploadedFile->path();
+            $extension = $uploadedFile->getClientOriginalExtension();
 
-        $transformMethod = FileTransformFactory::getConversionMethod($extension);
-        $typeAndExtension =  $transformMethod->getTypeAndExtension();
-        $this->setHeaders($typeAndExtension['extension'], $typeAndExtension['type']);
-        echo $transformMethod->convert($path, $sortBy);
-        exit();
+            /**
+             * Get the correct service to process the file
+             */
+            $transformMethod = FileTransformFactory::getConversionMethod($extension);
+            $typeAndExtension =  $transformMethod->getTypeAndExtension();
+            $this->setHeaders($typeAndExtension['extension'], $typeAndExtension['type']);
+            echo $transformMethod->convert($path, $sortBy);
+            exit();
+        } catch (\Throwable $e) {
+            // log error to external service if necessary
+            // return error as simple json
+            return Response::json([
+                'status' => false,
+                'errors' => $e->getMessage()
+            ], 400);
+        }
     }
 
     private function setHeaders($fileext, $filetype)

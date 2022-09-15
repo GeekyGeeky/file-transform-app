@@ -40,8 +40,6 @@ class CsvToJson implements FileTransform
 
         return json_encode($collection, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        // return '';
-        // return file_put_contents($path, $this->convert());
     }
     /**
      * @param       $line
